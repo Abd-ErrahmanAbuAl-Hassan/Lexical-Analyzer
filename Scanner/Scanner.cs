@@ -157,19 +157,44 @@ namespace Scanner
             int start = _index,
                 startColumn = _column;
             bool notDecimal = true;
-            while (!IsAtEnd() && (char.IsDigit(Peek()) || notDecimal))
+
+            // consume integer and fractional part
+            while (!IsAtEnd() && (char.IsDigit(Peek()) || (notDecimal && Peek() == '.')))
             {
                 if (Peek() == '.')
                     notDecimal = false;
-                else if (!char.IsDigit(Peek()))
-                    break;
 
                 Advance();
+            }
+
+            // check for exponent part (e or E)
+            if (!IsAtEnd() && (Peek() == 'e' || Peek() == 'E'))
+            {
+                Advance(); // consume e/E
+
+                // optional sign after exponent
+                if (!IsAtEnd() && (Peek() == '+' || Peek() == '-'))
+                    Advance();
+
+                // there must be at least one digit after e/E
+                if (!IsAtEnd() && char.IsDigit(Peek()))
+                {
+                    while (!IsAtEnd() && char.IsDigit(Peek()))
+                        Advance();
+                }
+                else
+                {
+                    // malformed exponent like "1e" or "2E-"
+                    // just step back one position to ignore the invalid e/E
+                    _index--;
+                    _column--;
+                }
             }
 
             string number = _source.Substring(start, _index - start);
             return new Token(TokenType.Number, number, _line, startColumn);
         }
+
 
         private Token HandleString()
         {

@@ -17,7 +17,6 @@ int main() {
     return 0;
 }
 ";
-
             var scanner = new Scanner(code);
             var tokens = scanner.Scan();
 
