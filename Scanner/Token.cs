@@ -13,7 +13,6 @@ namespace Scanner
         Identifier,
         Number,
         StringLiteral,
-        CharLiteral,
         Operator,
         Delimiter,
         Comment,

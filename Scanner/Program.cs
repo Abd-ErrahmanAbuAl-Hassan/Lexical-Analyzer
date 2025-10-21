@@ -18,7 +18,7 @@ int main() {
 }
 ";
 
-            var scanner = new Scanner(code, keepComments: true);
+            var scanner = new Scanner(code);
             var tokens = scanner.Scan();
 
             foreach (var token in tokens)
