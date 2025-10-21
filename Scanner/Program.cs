@@ -13,12 +13,12 @@ int main() {
     /* multi
        line comment */
     x += y * 2;
-    if (x >= 1.0 && x != 0) x++;
+    if (x >= 1.0 && x != 0) x++; //another comment
     return 0;
 }
 ";
 
-            var scanner = new Scanner(code, keepComments: false);
+            var scanner = new Scanner(code, keepComments: true);
             var tokens = scanner.Scan();
 
             foreach (var token in tokens)

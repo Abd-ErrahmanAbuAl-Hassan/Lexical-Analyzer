@@ -13,14 +13,10 @@ namespace Scanner
         private int _col = 1;
         private readonly List<Token> _tokens = new();
 
-        // Operators sorted longest-first to ensure maximal munch
-        private readonly string[] _operatorsSorted;
-
         public Scanner(string source, bool keepComments = false)
         {
             _src = source ?? string.Empty;
             _keepComments = keepComments;
-            _operatorsSorted = CDefinitions.Operators.OrderByDescending(s => s.Length).ToArray();
         }
 
         public IReadOnlyList<Token> Scan()
@@ -87,10 +83,20 @@ namespace Scanner
                 }
 
                 // Operators (longest-match)
-                string op = TryMatchOperator();
-                if (op != null)
+                if (CDefinitions.Operators.Contains(current.ToString()))
                 {
-                    AddToken(TokenType.Operator, op);
+                    Advance();
+                    char next = Peek();
+                    string combined = current.ToString() + next;
+
+                    if (CDefinitions.Operators.Contains(combined))
+                    {
+                        Advance(); // consume next char
+                        AddToken(TokenType.Operator, combined);
+                        continue;
+                    }
+
+                    AddToken(TokenType.Operator, current.ToString());
                     continue;
                 }
 
@@ -138,7 +144,7 @@ namespace Scanner
             }
             // newline consumed by whitespace handler at next loop iteration
             if (_keepComments)
-                _tokens.Add(new Token(TokenType.Comment, "//" + sb.ToString(), startLine, startCol));
+                _tokens.Add(new Token(TokenType.Comment, "//" + sb.ToString().TrimEnd('\r','\n'), startLine, startCol));
         }
 
         private void HandleBlockComment()
@@ -327,21 +333,6 @@ namespace Scanner
                 _idx++;
             }
             return new Token(TokenType.CharLiteral, sb.ToString(), startLine, startCol);
-        }
-
-        private string TryMatchOperator()
-        {
-            foreach (var op in _operatorsSorted)
-            {
-                if (MatchAhead(op))
-                {
-                    int startLine = _line, startCol = _col;
-                    for (int i = 0; i < op.Length; i++)
-                        Advance();
-                    return op;
-                }
-            }
-            return null;
         }
 
         // Helpers
