@@ -102,7 +102,9 @@ namespace Scanner
         }
         private Token HandleLineComment()
         {
-            int start = _index;
+            int start = _index
+                ,col=_column;
+
             Advance();
             Advance();
 
@@ -111,12 +113,13 @@ namespace Scanner
 
             string comment = _source.Substring(start, _index - start);
 
-            return new Token(TokenType.Comment, comment.TrimEnd('\r','\n'), _line, _column);
+            return new Token(TokenType.Comment, comment.TrimEnd('\r','\n'), _line, col);
         }
 
         private Token HandleMultiLineComment()
         {
-            int start = _index;
+            int start = _index
+                ,col=_column;
             Advance();
             Advance();
 
@@ -136,7 +139,7 @@ namespace Scanner
                 Advance();
             }
             string comment = _source.Substring(start, _index - start);
-            return new Token(TokenType.Comment, comment, _line, _column);
+            return new Token(TokenType.Comment, comment, _line, col);
 
         }
 
