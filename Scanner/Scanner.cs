@@ -122,8 +122,6 @@ namespace Scanner
                 }
                 _idx++;
             }
-            // Optionally keep whitespace tokens; currently we skip them.
-            // If you want to keep them: _tokens.Add(new Token(TokenType.Whitespace, sb.ToString(), startLine, startCol));
         }
 
         private void HandleLineComment()
